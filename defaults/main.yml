@@ -147,9 +147,8 @@ docker_py_pkg_state: "latest"
 ## set the option to true in the playbook.yml
 ## if you want to add to the root defined user ssh_keys
 ssh_key_add_superadmin: false
-# ssh_pubkey_file_path: ~/.ssh/id_rsa_jvce.pub
-ssh_users_pubkey_file_path: ./ssh_pubkey_users/
-ssh_superadmin_pubkey_file_path: ./ssh_pubkey_admin/
+ssh_users_pubkey_file_path: ./ssh_keys/users/
+ssh_superadmin_pubkey_file_path: ./ssh_keys/admin/
 # A list of users who will be added to the docker group.
 ## Should be defined in the playbook.yml instead of here
 docker_users: {}
