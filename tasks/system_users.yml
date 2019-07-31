@@ -1,0 +1,30 @@
+---
+- name: Create system users
+  user:
+    name: "{{ item }}"
+    state: present
+    shell: /bin/bash       # Defaults to /bin/bash
+    system: no             # Defaults to no
+    createhome: yes        # Defaults to yes
+    home: /home/{{ item }}  # Defaults to /home/<username>
+  with_items: 
+    - "{{ system_users }}"
+
+- name: Set authorized key to system users
+  authorized_key:
+    user: "{{ item }}"
+    state: present
+    # key: "{{ lookup('file', '{{ ssh_pubkey_file_path }}') }}"
+    key: "{% for key in query('fileglob', '{{ ssh_users_pubkey_file_path }}/*') %}{{ lookup('file', key) ~ '\n'}}{% endfor %}"
+  with_items: 
+    - "{{ system_users }}"
+
+- name: Set authorized key to Admin users
+  authorized_key:
+    user: "{{ item }}"
+    state: present
+    # key: "{{ lookup('file', '{{ ssh_pubkey_file_path }}') }}"
+    key: "{% for key in query('fileglob', '{{ ssh_superadmin_pubkey_file_path }}/*') %}{{ lookup('file', key) ~ '\n'}}{% endfor %}"
+  with_items: 
+    - "{{ superadmin_users }}"
+  when: ssh_key_add_superadmin

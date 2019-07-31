@@ -1,0 +1,160 @@
+---
+# Edition can be one of: 'ce' (Community Edition) or 'ee' (Enterprise Edition).
+docker_edition: 'ce'
+docker_package: "docker-{{ docker_edition }}"
+docker_package_state: present
+
+# Service options.
+docker_service_state: started
+docker_service_enabled: true
+docker_restart_handler_state: restarted
+
+# Docker Compose options.
+docker_install_compose: true
+docker_compose_version: "1.24.0"
+docker_compose_path: /usr/local/bin/docker-compose
+
+#########################################################
+### USERNS
+## uncomment below to active usernamespace in docker
+# Docker User Namespace Options.
+docker_userns_config: false
+# docker_usernamespace_name: "harbor"
+#########################################################
+
+###############################################################
+### Secure Credential storage (!! Broken in 19.03 !! )
+## uncomment below to activate docker secure credential helper
+# # Docker Secure credentials store
+docker_secure_config: false
+# docker_secure_helper: "pass"
+
+# # Docker credential helper
+# docker_ch_version: "0.6.2"
+# docker_ch_source_url: https://github.com/docker/docker-credential-helpers/releases/download/v{{ docker_ch_version }}/docker-credential-{{ docker_secure_helper }}-v{{ docker_ch_version }}-amd64.tar.gz
+###############################################################
+
+# Used only for Debian/Ubuntu. Switch 'stable' to 'edge' if needed.
+docker_apt_release_channel: stable
+docker_apt_arch: amd64
+docker_apt_repository: "deb [arch={{ docker_apt_arch }}] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
+docker_apt_ignore_key_error: true
+
+# Used only for RedHat/CentOS/Fedora.
+docker_yum_repo_url: https://download.docker.com/linux/{{ (ansible_distribution == "Fedora") | ternary("fedora","centos") }}/docker-{{ docker_edition }}.repo
+docker_yum_repo_enable_edge: 0
+docker_yum_repo_enable_test: 0
+
+# default dockerd configuration options ----------------------------------------
+## https://docs.docker.com/engine/reference/commandline/dockerd/#/linux-configuration-file
+
+## docker_config_hosts option removed because docker-ce packaging in ubuntu prevents this:
+## https://github.com/docker/docker-ce-packaging/pull/132
+# docker_config_hosts:
+#   - "unix:///var/run/docker.sock"
+docker_config_data_root: "/home/docker"
+docker_config_log_driver: ""
+docker_config_log_opts: {}
+docker_config_max_concurrent_downloads: 3
+docker_config_max_concurrent_uploads: 5
+docker_config_debug: false
+docker_config_log_level: ""
+docker_config_bridge: ~
+docker_config_bip: "172.16.0.1/24"
+docker_config_fixed_cidr: "172.16.0.0/24"
+docker_config_fixed_cidr_v6: ""
+docker_config_default_gateway: ""
+docker_config_default_gateway_v6: ""
+docker_config_selinux_enabled: false
+docker_config_ip: "0.0.0.0"
+docker_config_group: "{{ docker_group }}"
+docker_config_insecure_registries: []
+#########################################################
+### USERNS
+## uncomment below to active usernamespace in docker
+# docker_userns_name: "{{ docker_usernamespace_name }}"
+#########################################################
+
+###############################################################
+### Secure Credential storage (!! Broken in 19.03 !! )
+## uncomment below to activate docker secure credential helper
+#docker_secure_credentials: "{{ docker_secure_helper }}"
+###############################################################
+# disable tls for now because tlsverify option implemented strangely
+# https://github.com/docker/docker/issues/27105
+##docker_config_tls: ~
+# broken if you specify anything but true for tlsverify
+##docker_config_tlsverify: ~
+##docker_config_tlscacert: ""
+##docker_config_tlscert: ""
+##docker_config_tlskey: ""
+
+
+# ==============================================================================
+# dictionary of common configuration options  ----------------------------------
+# ==============================================================================
+docker_config_common:
+  "log-driver": "{{ docker_config_log_driver }}"
+  "log-opts": "{{ docker_config_log_opts }}"
+  "data-root": "{{ docker_config_data_root }}"
+  "max-concurrent-downloads": "{{ docker_config_max_concurrent_downloads }}"
+  "max-concurrent-uploads": "{{ docker_config_max_concurrent_uploads }}"
+  "debug": "{{ docker_config_debug }}"
+  ## hosts option removed in common because docker-ce packaging in ubuntu prevents this:
+  ## https://github.com/docker/docker-ce-packaging/pull/132
+  # "hosts": "{{ docker_config_hosts }}"
+  "log-level": "{{ docker_config_log_level }}"
+  "selinux-enabled": "{{ docker_config_selinux_enabled }}"
+  "group": "{{ docker_config_group }}"
+  "bridge": "{{ docker_config_bridge }}"
+  "bip": "{{ docker_config_bip }}"
+  "fixed-cidr": "{{ docker_config_fixed_cidr }}"
+  "fixed-cidr-v6": "{{ docker_config_fixed_cidr_v6 }}"
+  "default-gateway": "{{ docker_config_default_gateway }}"
+  "default-gateway-v6": "{{ docker_config_default_gateway_v6 }}"
+  "insecure-registries": "{{ docker_config_insecure_registries }}"
+  "ip": "{{ docker_config_ip }}"
+
+# ==============================================================================
+# dictionary for extra/custom settings that can be added -----------------------
+# ==============================================================================
+# https://docs.docker.com/engine/reference/commandline/dockerd/#/linux-configuration-file
+docker_config_custom: {}
+### USERNS
+## uncomment below to active usernamespace in docker 
+  # "userns-remap": "{{ docker_usernamespace_name }}"
+
+# ==============================================================================
+# dictionary of common Docker Client configuration options  ----------------------------------
+# ==============================================================================
+docker_client_config_common:  
+### Secure Credential storage (!! Broken in 19.03 !! )
+## uncomment below to activate docker secure credential helper
+#  "credsStore": "{{ docker_secure_credentials }}"
+
+# ==============================================================================
+# dictionary for extra/custom Docker Client settings that can be added -----------------------
+# ==============================================================================
+# https://docs.docker.com/engine/reference/commandline/login/
+docker_client_config_custom: {}
+
+docker_install_py_module: true
+## python-docker pkg name and state are defaulted for each OS.
+## use options below if you wish to override them
+docker_py_pkg_name: "python-docker"
+docker_py_pkg_state: "latest"
+
+## set the option to true in the playbook.yml
+## if you want to add to the root defined user ssh_keys
+ssh_key_add_superadmin: false
+# ssh_pubkey_file_path: ~/.ssh/id_rsa_jvce.pub
+ssh_users_pubkey_file_path: ./ssh_pubkey_users/
+ssh_superadmin_pubkey_file_path: ./ssh_pubkey_admin/
+# A list of users who will be added to the docker group.
+## Should be defined in the playbook.yml instead of here
+docker_users: {}
+system_users: {}
+
+# list of superadmin / privileged users to add a defined ssh_key
+## Should be defined in the playbook.yml instead of here
+superadmin_users: {}

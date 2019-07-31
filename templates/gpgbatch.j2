@@ -1,0 +1,10 @@
+%echo Generating a default key
+Key-Type: default
+Subkey-Type: default
+Name-Real: {{ docker_users }}
+Name-Comment: {{ docker_users }} {{ ansible_facts['nodename'] }} docker gpg vault
+Name-Email: {{ docker_users }}@{{ ansible_facts['nodename'] }}
+Expire-Date: 0
+Passphrase: {{ docker_ch_userpassphrase }}
+%commit
+%echo done

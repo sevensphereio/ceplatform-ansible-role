@@ -1,0 +1,14 @@
+---
+- name: Add namespace mapping files
+  lineinfile: 
+    path: /etc/{{ item }} 
+    line: '{{ docker_userns_name }}:1000:65536'
+    state: present
+    create: yes 
+    owner: root 
+    group: root 
+    mode: 0600 
+  with_items:
+    - subuid
+    - subgid
+  notify: restart docker
