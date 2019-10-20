@@ -5,6 +5,7 @@
   changed_when: False
 
 - name: "create primary swarm manager"
-  shell: docker swarm init --advertise-addr {{ ansible_eth0['ipv4']['address'] }}
-  become: true
+  shell: docker swarm init --advertise-addr {{ ansible_enp0s3['ipv4']['address'] }}
+#  shell: docker swarm init --advertise-addr {{ ansible_eth0['ipv4']['address'] }}  
+  become: true 
   when: "docker_info.stdout.find('Swarm: inactive') != -1"
