@@ -33,3 +33,11 @@
     section: 'docker-{{ docker_edition }}-test'
     option: enabled
     value: '{{ docker_yum_repo_enable_test }}'
+    
+- name: Install Docker Python Module
+  yum:
+    name: "{{ docker_py_pkg_name | default('python-docker-py') }}"
+    state: "{{ docker_py_pkg_state | default('latest') }}"
+    disable_gpg_check: no
+  when:
+    - docker_install_py_module
