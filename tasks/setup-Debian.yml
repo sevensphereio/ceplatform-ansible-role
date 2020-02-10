@@ -40,3 +40,10 @@
     repo: "{{ docker_apt_repository }}"
     state: present
     update_cache: true
+
+- name: Install Docker Python Module
+  apt:
+    name: "{{ docker_py_pkg_name | default('python-docker') }}"
+    state: "{{ docker_py_pkg_state | default('latest') }}"
+  when:
+    - docker_install_py_module
