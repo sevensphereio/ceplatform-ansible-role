@@ -42,14 +42,6 @@
 - include_tasks: docker-userns.yml
   when: docker_userns_config
 
-- name: Install Docker Python Module
-  apt:
-    name: "{{ docker_py_pkg_name | default('python-docker') }}"
-    state: "{{ docker_py_pkg_state | default('latest') }}"
-  when:
-    - docker_install_py_module
-  notify: restart docker
-
 - include_tasks: docker-swarm.yml
   tags:
     - "docker_swarm"
